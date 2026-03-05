@@ -230,7 +230,7 @@ export namespace ProviderTransform {
     model: Provider.Model,
     sessionID: string,
     providerOptions?: Record<string, any>,
-    thinkingLevel?: "low" | "medium" | "high",
+    thinkingLevel?: "low" | "medium" | "high" | "xhigh",
   ): Record<string, any> {
     const result: Record<string, any> = {}
     const supportsThinking =
@@ -268,6 +268,10 @@ export namespace ProviderTransform {
     if (model.api.id.includes("gpt-5") && !model.api.id.includes("gpt-5-chat")) {
       if (model.providerID.includes("codex")) {
         result["store"] = false
+        // gpt-5.2-codex and gpt-5.3-codex support xhigh reasoning
+        if (model.api.id.includes("gpt-5.2-codex") || model.api.id.includes("gpt-5.3-codex")) {
+          result["reasoningEffort"] = thinkingLevel ?? "medium"
+        }
       }
 
       if (!model.api.id.includes("codex") && !model.api.id.includes("gpt-5-pro")) {

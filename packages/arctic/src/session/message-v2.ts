@@ -305,7 +305,7 @@ export namespace MessageV2 {
     }),
     system: z.string().optional(),
     tools: z.record(z.string(), z.boolean()).optional(),
-    thinkingLevel: z.enum(["low", "medium", "high"]).optional(),
+    thinkingLevel: z.enum(["low", "medium", "high", "xhigh"]).optional(),
   }).meta({
     ref: "UserMessage",
   })
@@ -615,7 +615,10 @@ export namespace MessageV2 {
           try {
             const body = JSON.parse(e.responseBody)
             // try to extract common error message fields
-            const errMsg = body.message || body.error || body.error?.message
+            const errMsg =
+              (typeof body.error?.friendly_message === "string" && body.error.friendly_message) ||
+              (typeof body.error?.message === "string" && body.error.message) ||
+              (typeof body.message === "string" && body.message)
             if (errMsg && typeof errMsg === "string") {
               return `${msg}: ${errMsg}`
             }

@@ -1648,9 +1648,12 @@ export function Prompt(props: PromptProps) {
                     <text
                       fg={
                         supportsReasoning
-                          ? ({ low: theme.textMuted, medium: theme.warning, high: theme.primary }[
-                              local.thinking.current()
-                            ] ?? theme.textMuted)
+                          ? ({
+                              low: theme.textMuted,
+                              medium: theme.warning,
+                              high: theme.primary,
+                              xhigh: theme.success,
+                            }[local.thinking.current()] ?? theme.textMuted)
                           : theme.textMuted
                       }
                       onMouseUp={(e) => {

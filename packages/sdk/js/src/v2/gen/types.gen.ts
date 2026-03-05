@@ -170,7 +170,7 @@ export type UserMessage = {
   tools?: {
     [key: string]: boolean
   }
-  thinkingLevel?: "low" | "medium" | "high"
+  thinkingLevel?: "low" | "medium" | "high" | "xhigh"
 }
 
 export type ProviderAuthError = {
@@ -773,13 +773,6 @@ export type EventGlobalDisposed = {
   }
 }
 
-export type EventIdeInstalled = {
-  type: "ide.installed"
-  properties: {
-    ide: string
-  }
-}
-
 export type Event =
   | EventInstallationUpdated
   | EventInstallationUpdateAvailable
@@ -816,7 +809,6 @@ export type Event =
   | EventVcsBranchUpdated
   | EventServerConnected
   | EventGlobalDisposed
-  | EventIdeInstalled
 
 export type GlobalEvent = {
   directory: string
@@ -3040,7 +3032,7 @@ export type SessionPromptData = {
     tools?: {
       [key: string]: boolean
     }
-    thinkingLevel?: "low" | "medium" | "high"
+    thinkingLevel?: "low" | "medium" | "high" | "xhigh"
     parts: Array<TextPartInput | FilePartInput | AgentPartInput | SubtaskPartInput>
   }
   path: {
@@ -3136,7 +3128,7 @@ export type SessionPromptAsyncData = {
     tools?: {
       [key: string]: boolean
     }
-    thinkingLevel?: "low" | "medium" | "high"
+    thinkingLevel?: "low" | "medium" | "high" | "xhigh"
     parts: Array<TextPartInput | FilePartInput | AgentPartInput | SubtaskPartInput>
   }
   path: {

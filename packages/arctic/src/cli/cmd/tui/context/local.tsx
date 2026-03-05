@@ -13,8 +13,8 @@ import { useArgs } from "./args"
 import { useSDK } from "./sdk"
 import { RGBA } from "@opentui/core"
 
-export type ThinkingLevel = "low" | "medium" | "high"
-const THINKING_LEVELS: ThinkingLevel[] = ["low", "medium", "high"]
+export type ThinkingLevel = "low" | "medium" | "high" | "xhigh"
+const THINKING_LEVELS: ThinkingLevel[] = ["low", "medium", "high", "xhigh"]
 
 export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
   name: "Local",
@@ -367,6 +367,30 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
         Bun.write(file, JSON.stringify({ level: thinkingStore.level }))
       }
 
+      // Reset thinking level to medium if current level is xhigh and model doesn't support it
+      createEffect(() => {
+        const m = model.current()
+        if (!m) return
+        const currentLevel = thinkingStore.level
+        if (currentLevel === "xhigh") {
+          const provider = sync.data.provider.find((x) => x.id === m.providerID)
+          const info = provider?.models[m.modelID]
+          const id = (info?.api?.id ?? info?.id ?? m.modelID).toLowerCase()
+          const supportsXHigh =
+            id.includes("gpt-5.2-codex") ||
+            id.includes("gpt-5.3-codex") ||
+            id.includes("gpt-5.4") ||
+            (id.includes("gpt-5") &&
+              !id.includes("codex") &&
+              !id.includes("gpt-5-chat") &&
+              (id.includes("gpt-5.2") || id.includes("gpt-5.3") || id.includes("gpt-5.4")))
+          if (!supportsXHigh) {
+            setThinkingStore("level", "medium")
+            save()
+          }
+        }
+      })
+
       return {
         current() {
           return thinkingStore.level
@@ -382,10 +406,28 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
           const info = provider?.models[m.modelID]
           if (!info?.capabilities.reasoning) return
           const current = thinkingStore.level
-          const index = THINKING_LEVELS.indexOf(current)
-          const next = THINKING_LEVELS[(index + 1) % THINKING_LEVELS.length]!
+          const supportsXHigh = this.supportsXHigh()
+          const levels = supportsXHigh ? THINKING_LEVELS : THINKING_LEVELS.filter((l) => l !== "xhigh")
+          const index = levels.indexOf(current)
+          const next = levels[(index + 1) % levels.length]!
           setThinkingStore("level", next)
           save()
+        },
+        supportsXHigh() {
+          const m = model.current()
+          if (!m) return false
+          const provider = sync.data.provider.find((x) => x.id === m.providerID)
+          const info = provider?.models[m.modelID]
+          const id = (info?.api?.id ?? info?.id ?? m.modelID).toLowerCase()
+          // xhigh is supported on gpt-5.2-codex, gpt-5.3-codex, and gpt-5.4+
+          if (id.includes("gpt-5.2-codex") || id.includes("gpt-5.3-codex")) return true
+          if (id.includes("gpt-5.4")) return true
+          // non-codex gpt-5 models support xhigh
+          if (id.includes("gpt-5") && !id.includes("codex") && !id.includes("gpt-5-chat")) {
+            // gpt-5.2+ non-codex supports xhigh
+            if (id.includes("gpt-5.2") || id.includes("gpt-5.3") || id.includes("gpt-5.4")) return true
+          }
+          return false
         },
         supportsReasoning() {
           const m = model.current()

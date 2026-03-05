@@ -103,7 +103,7 @@ export namespace SessionPrompt {
     noReply: z.boolean().optional(),
     system: z.string().optional(),
     tools: z.record(z.string(), z.boolean()).optional(),
-    thinkingLevel: z.enum(["low", "medium", "high"]).optional(),
+    thinkingLevel: z.enum(["low", "medium", "high", "xhigh"]).optional(),
     parts: z.array(
       z.discriminatedUnion("type", [
         MessageV2.TextPart.omit({

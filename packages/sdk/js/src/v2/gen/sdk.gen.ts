@@ -1343,7 +1343,7 @@ export class Session extends HeyApiClient {
       tools?: {
         [key: string]: boolean
       }
-      thinkingLevel?: "low" | "medium" | "high"
+      thinkingLevel?: "low" | "medium" | "high" | "xhigh"
       parts?: Array<TextPartInput | FilePartInput | AgentPartInput | SubtaskPartInput>
     },
     options?: Options<never, ThrowOnError>,
@@ -1431,7 +1431,7 @@ export class Session extends HeyApiClient {
       tools?: {
         [key: string]: boolean
       }
-      thinkingLevel?: "low" | "medium" | "high"
+      thinkingLevel?: "low" | "medium" | "high" | "xhigh"
       parts?: Array<TextPartInput | FilePartInput | AgentPartInput | SubtaskPartInput>
     },
     options?: Options<never, ThrowOnError>,
